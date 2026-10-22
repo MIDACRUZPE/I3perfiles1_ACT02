@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instituto i3 | El Enigma del Perfil Perdido</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            i3Yellow: '#FACC15',
+            i3PurpleHeader: '#4C1D95',
+            i3PurpleDark: '#3B0764',
+            i3Cyan: '#06B6D4',
+            i3Orange: '#F97316',
+            i3Lime: '#A3E635',
+            i3Pink: '#EC4899',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #FEF08A; /* Tone: Light yellow background */
+    }
+
+    /* Custom Sticker 3D Styles */
+    .sticker-card {
+      border: 4px solid #FFFFFF;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      border-radius: 1.5rem;
+    }
+
+    .sticker-btn {
+      border-bottom: 4px solid rgba(0,0,0,0.3);
+      transition: all 0.15s ease-in-out;
+    }
+
+    .sticker-btn:active {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+
+    /* Word wrapping for safety */
+    .break-words-all {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    /* FIX 2: Reglas de impresión para la página principal (Ctrl+P directo) */
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; color: black !important; padding-bottom: 0 !important; }
+      main { padding-bottom: 0 !important; }
+    }
+  </style>
+</head>
+<body class="bg-yellow-100 min-h-screen text-slate-900 pb-44 sm:pb-36">
+
+  <!-- ==================== HEADER & NAVBAR ==================== -->
+  <header class="bg-purple-900 text-white sticky top-0 z-40 shadow-xl border-b-4 border-yellow-400 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand Logo & Title -->
+      <div class="flex items-center gap-3">
+        <div class="bg-yellow-400 text-purple-950 font-black text-2xl px-3 py-1 rounded-xl shadow border-2 border-white transform -rotate-2">
+          i3
+        </div>
+        <div>
+          <h1 class="text-xl md:text-2xl font-black tracking-tight text-yellow-300">Instituto i3</h1>
+          <p class="text-xs text-purple-200 font-bold uppercase tracking-wider">Escape Room: El Enigma del Perfil Perdido</p>
+        </div>
+      </div>
+
+      <!-- Timer & Controls -->
+      <div class="flex items-center gap-3 bg-purple-950 px-4 py-2 rounded-2xl border-2 border-purple-700">
+        <i class="fa-solid fa-clock text-yellow-400 text-xl animate-pulse"></i>
+        <div class="text-center">
+          <div class="text-xs text-purple-300 uppercase font-bold">Tiempo Restante</div>
+          <div id="timer-display" class="font-mono text-xl md:text-2xl font-extrabold text-yellow-400">65:00</div>
+        </div>
+        <button onclick="resetTimer()" title="Reiniciar Temporizador" class="ml-2 text-purple-300 hover:text-white transition">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+      </div>
+
+      <!-- Sync Status & JSON Actions with i3 Arrow ▶ -->
+      <div class="flex items-center gap-2">
+        <button onclick="downloadBackup()" class="bg-cyan-500 hover:bg-cyan-600 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 shadow sticker-btn">
+          <i class="fa-solid fa-download"></i> <span class="hidden md:inline">Descargar</span> JSON ▶
+        </button>
+        <label class="bg-teal-500 hover:bg-teal-600 text-white px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1 shadow sticker-btn">
+          <i class="fa-solid fa-upload"></i> <span class="hidden md:inline">Cargar</span> JSON ▶
+          <input type="file" id="json-file-input" onchange="handleFileUpload(event)" class="hidden" accept=".json">
+        </label>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 pt-6 space-y-8">
+
+    <!-- ==================== BANNER NARRATIVO ==================== -->
+    <section class="bg-orange-500 text-white p-6 rounded-3xl border-4 border-white shadow-xl relative overflow-hidden">
+      <div class="absolute -right-6 -bottom-6 opacity-15 text-9xl text-black select-none pointer-events-none">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-4">
+        <div class="bg-yellow-400 text-orange-950 p-4 rounded-2xl text-3xl font-black shadow border-2 border-white flex-shrink-0">
+          🚨
+        </div>
+        <div>
+          <span class="bg-yellow-300 text-orange-950 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
+            ALERTA MÁXIMA EN "INNOVACIÓN & RETAIL S.A."
+          </span>
+          <h2 class="text-2xl md:text-3xl font-extrabold mt-1">¡El Gerente de Talento Humano ha renunciado!</h2>
+          <p class="text-orange-100 font-semibold text-sm md:text-base mt-2 leading-relaxed">
+            Antes de irse, bloqueó el sistema de nómina y selección con un candado criptográfico de 4 dígitos. La empresa está al borde del caos operativo. Vuestro equipo de consultores tiene 65 minutos para resolver los 4 retos teóricos, descifrar los códigos y salvar la operación. ¡El tiempo corre!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SECCIÓN 0 - DATOS DEL TALLER ==================== -->
+    <section class="bg-purple-800 text-white p-6 md:p-8 rounded-3xl border-4 border-white shadow-xl">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="bg-yellow-400 text-purple-950 w-10 h-10 rounded-xl flex items-center justify-center font-black text-xl shadow">
+          0
+        </div>
+        <h3 class="text-2xl font-extrabold text-yellow-300">Registro de Equipo y Ficha Técnica</h3>
+      </div>
+
+      <form id="form-registro" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold uppercase text-purple-200 mb-1">Materia / Asignatura</label>
+          <input type="text" id="input-materia" name="materia" value="Diseño y Análisis de Perfiles" 
+                 class="w-full bg-purple-900 border-2 border-purple-600 rounded-xl px-4 py-2 font-bold text-white focus:outline-none focus:border-yellow-400 transition" placeholder="Nombre de la materia">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase text-purple-200 mb-1">ID de Actividad (Congelado)</label>
+          <!-- CAMPO CONGELADO Y OBLIGATORIO -->
+          <input type="text" id="input-actividad-id" name="actividad_id" value="Perfiles1_ACT02" readonly 
+                 class="w-full bg-gray-100 border-2 border-gray-300 rounded-xl px-4 py-2 font-mono font-bold text-gray-700 cursor-not-allowed opacity-80" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase text-purple-200 mb-1">Grupo / Ficha</label>
+          <input type="text" id="input-grupo" name="grupo" placeholder="Ej: Grupo 301-A" 
+                 class="w-full bg-purple-900 border-2 border-purple-600 rounded-xl px-4 py-2 font-bold text-white focus:outline-none focus:border-yellow-400 transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase text-purple-200 mb-1">Integrantes del Equipo (Separados por coma)</label>
+          <input type="text" id="input-participantes" name="participantes" placeholder="Ej: Ana Gómez, Carlos Pérez, Sofía Díaz" 
+                 class="w-full bg-purple-900 border-2 border-purple-600 rounded-xl px-4 py-2 font-bold text-white focus:outline-none focus:border-yellow-400 transition">
+        </div>
+      </form>
+    </section>
+
+    <!-- ==================== RUTA GUÍA AUTÓNOMA DEL ESTUDIANTE ==================== -->
+    <section class="bg-cyan-500 text-white p-6 rounded-3xl border-4 border-white shadow-xl">
+      <h3 class="text-xl font-extrabold text-purple-950 flex items-center gap-2 mb-4">
+        <i class="fa-solid fa-map-location-dot text-2xl"></i> Ruta de Trabajo Autónomo del Estudiante
+      </h3>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div class="bg-white/10 backdrop-blur p-4 rounded-2xl border-2 border-white/20">
+          <div class="bg-yellow-400 text-purple-950 font-black w-8 h-8 rounded-full flex items-center justify-center mb-2 shadow">1</div>
+          <h4 class="font-bold text-purple-950 text-sm">Paso 1: Análisis Teórico</h4>
+          <p class="text-xs text-purple-950 font-semibold mt-1">Lee las explicaciones sencillas y analogías en cada estación.</p>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur p-4 rounded-2xl border-2 border-white/20">
+          <div class="bg-yellow-400 text-purple-950 font-black w-8 h-8 rounded-full flex items-center justify-center mb-2 shadow">2</div>
+          <h4 class="font-bold text-purple-950 text-sm">Paso 2: Retos Interactivos</h4>
+          <p class="text-xs text-purple-950 font-semibold mt-1">Resuelve las actividades para encontrar los 4 dígitos del código.</p>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur p-4 rounded-2xl border-2 border-white/20">
+          <div class="bg-yellow-400 text-purple-950 font-black w-8 h-8 rounded-full flex items-center justify-center mb-2 shadow">3</div>
+          <h4 class="font-bold text-purple-950 text-sm">Paso 3: Candado Digital</h4>
+          <p class="text-xs text-purple-950 font-semibold mt-1">Ingresa o verifica el código en el panel flotante inferior para liberar el sistema.</p>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur p-4 rounded-2xl border-2 border-white/20">
+          <div class="bg-yellow-400 text-purple-950 font-black w-8 h-8 rounded-full flex items-center justify-center mb-2 shadow">4</div>
+          <h4 class="font-bold text-purple-950 text-sm">Paso 4: Envío & PDF</h4>
+          <p class="text-xs text-purple-950 font-semibold mt-1">Responde la síntesis, transmite a Sheets y descarga tu reporte PDF.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== ESTACIÓN 1 ==================== -->
+    <section class="bg-white p-6 md:p-8 rounded-3xl border-4 border-purple-900 shadow-xl space-y-6">
+      <div class="flex items-center justify-between flex-wrap gap-2 border-b-4 border-yellow-400 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="bg-purple-800 text-yellow-300 font-black text-2xl w-12 h-12 rounded-2xl flex items-center justify-center shadow">
+            1
+          </div>
+          <div>
+            <span class="text-xs font-bold text-purple-600 uppercase tracking-widest">Estación 1</span>
+            <h3 class="text-2xl font-black text-purple-950">La Escalera del Trabajo y Niveles OIT</h3>
+          </div>
+        </div>
+        <span class="bg-yellow-400 text-purple-950 text-xs font-black px-3 py-1 rounded-full uppercase border-2 border-black/10">
+          Dígito 1 / 4
+        </span>
+      </div>
+
+      <!-- Pista Teórica Simplificada + Analogía Accesible (Luz Roja 1 Solucionada) -->
+      <div class="bg-purple-50 p-5 rounded-2xl border-2 border-purple-200 text-sm space-y-3">
+        <h4 class="font-extrabold text-purple-900 text-base flex items-center gap-2">
+          <i class="fa-solid fa-lightbulb text-yellow-500"></i> Explicación Sencilla: De lo Simple a lo Complejo en el Trabajo
+        </h4>
+        <p class="text-slate-700 leading-relaxed text-xs font-medium">
+          Organizar el trabajo en una empresa es como construir una escalera: va desde un movimiento simple hasta un grupo de empleos.
+        </p>
+
+        <!-- CAJA DE ANALOGÍA DÍA A DÍA -->
+        <div class="bg-yellow-200 border-2 border-yellow-400 p-3.5 rounded-xl text-xs text-purple-950 space-y-1">
+          <p class="font-black text-purple-900 flex items-center gap-1">
+            🍔 Ejemplo Cotidiano (Analogía del Restaurante):
+          </p>
+          <ul class="list-disc list-inside space-y-0.5 font-semibold text-slate-800">
+            <li><strong>Tarea:</strong> Lavar un plato o secar una mesa (acción física puntual).</li>
+            <li><strong>Atribución:</strong> Limpiar exclusivamente la zona VIP (tarea específica asignada).</li>
+            <li><strong>Función:</strong> Mantener impecables todas las áreas del restaurante durante el turno.</li>
+            <li><strong>Cargo:</strong> Auxiliar de Limpieza e Higiene (el puesto oficial contratado).</li>
+          </ul>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 text-xs font-semibold pt-1">
+          <div class="bg-white p-2.5 rounded-xl border border-purple-200">
+            <span class="text-purple-800 font-extrabold block">🔹 Nivel 1 OIT</span>
+            Manual básico / Primaria.
+          </div>
+          <div class="bg-white p-2.5 rounded-xl border border-purple-200">
+            <span class="text-purple-800 font-extrabold block">🔹 Nivel 2 OIT</span>
+            Operativo / Manejo de máquinas.
+          </div>
+          <div class="bg-white p-2.5 rounded-xl border border-purple-200">
+            <span class="text-purple-800 font-extrabold block">🔹 Nivel 3 OIT</span>
+            Soporte técnico / Tecnólogo.
+          </div>
+          <div class="bg-white p-2.5 rounded-xl border border-purple-200">
+            <span class="text-purple-800 font-extrabold block">🔹 Nivel 4 OIT</span>
+            Profesional / Dirección.
+          </div>
+        </div>
+      </div>
+
+      <!-- Reto Interactivo 1 -->
+      <div class="bg-yellow-50 p-5 rounded-2xl border-2 border-yellow-300 space-y-4">
+        <h4 class="font-extrabold text-purple-900 text-base">
+          🎯 Reto: Clasifica los siguientes 3 puestos en su Nivel OIT correcto
+        </h4>
+        <p class="text-xs text-slate-600 font-semibold">
+          Selecciona el Nivel (1 al 4) para cada puesto. El <strong>Dígito 1</strong> será la SUMA de los tres niveles correctos.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Puesto A -->
+          <div class="bg-white p-4 rounded-xl border-2 border-slate-200 shadow-sm space-y-2">
+            <span class="text-xs font-black text-purple-700 uppercase">Puesto A</span>
+            <p class="text-xs text-slate-800 font-bold">Auxiliar de Limpieza General</p>
+            <p class="text-xs text-slate-500">Ejecuta tareas rutinarias manuales de aseo.</p>
+            <select id="st1-p1" onchange="calcEstacion1()" class="w-full bg-slate-100 border-2 border-purple-300 rounded-lg p-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-purple-600">
+              <option value="0">-- Selecciona Nivel --</option>
+              <option value="1">Nivel 1 (Manual Básica)</option>
+              <option value="2">Nivel 2 (Operativa)</option>
+              <option value="3">Nivel 3 (Técnica)</option>
+              <option value="4">Nivel 4 (Profesional)</option>
+            </select>
+          </div>
+
+          <!-- Puesto B -->
+          <div class="bg-white p-4 rounded-xl border-2 border-slate-200 shadow-sm space-y-2">
+            <span class="text-xs font-black text-purple-700 uppercase">Puesto B</span>
+            <p class="text-xs text-slate-800 font-bold">Técnico Electricista</p>
+            <p class="text-xs text-slate-500">Diagnostica fallas e instala redes complejas.</p>
+            <select id="st1-p2" onchange="calcEstacion1()" class="w-full bg-slate-100 border-2 border-purple-300 rounded-lg p-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-purple-600">
+              <option value="0">-- Selecciona Nivel --</option>
+              <option value="1">Nivel 1 (Manual Básica)</option>
+              <option value="2">Nivel 2 (Operativa)</option>
+              <option value="3">Nivel 3 (Técnica / Tecnológica)</option>
+              <option value="4">Nivel 4 (Profesional)</option>
+            </select>
+          </div>
+
+          <!-- Puesto C -->
+          <div class="bg-white p-4 rounded-xl border-2 border-slate-200 shadow-sm space-y-2">
+            <span class="text-xs font-black text-purple-700 uppercase">Puesto C</span>
+            <p class="text-xs text-slate-800 font-bold">Director de Analítica de Datos</p>
+            <p class="text-xs text-slate-500">Diseña algoritmos, toma decisiones de alto nivel.</p>
+            <select id="st1-p3" onchange="calcEstacion1()" class="w-full bg-slate-100 border-2 border-purple-300 rounded-lg p-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-purple-600">
+              <option value="0">-- Selecciona Nivel --</option>
+              <option value="1">Nivel 1 (Manual Básica)</option>
+              <option value="2">Nivel 2 (Operativa)</option>
+              <option value="3">Nivel 3 (Técnica)</option>
+              <option value="4">Nivel 4 (Profesional / Posgrado)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Resultado Estación 1 -->
+        <div class="bg-purple-900 text-white p-4 rounded-xl flex items-center justify-between flex-wrap gap-2">
+          <div class="text-xs font-bold">
+            Fórmula: Nivel(A) + Nivel(B) + Nivel(C) = <span id="st1-formula" class="text-yellow-300 font-mono text-sm">?</span>
+          </div>
+          <div class="bg-yellow-400 text-purple-950 px-4 py-1.5 rounded-lg text-sm font-black">
+            Dígito 1 Obtenido: <span id="digito-1-val" class="text-lg">?</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== ESTACIÓN 2 ==================== -->
+    <section class="bg-white p-6 md:p-8 rounded-3xl border-4 border-purple-900 shadow-xl space-y-6">
+      <div class="flex items-center justify-between flex-wrap gap-2 border-b-4 border-yellow-400 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="bg-purple-800 text-yellow-300 font-black text-2xl w-12 h-12 rounded-2xl flex items-center justify-center shadow">
+            2
+          </div>
+          <div>
+            <span class="text-xs font-bold text-purple-600 uppercase tracking-widest">Estación 2</span>
+            <h3 class="text-2xl font-black text-purple-950">El Decodificador CIUO-08</h3>
+          </div>
+        </div>
+        <span class="bg-yellow-400 text-purple-950 text-xs font-black px-3 py-1 rounded-full uppercase border-2 border-black/10">
+          Dígito 2 / 4
+        </span>
+      </div>
+
+      <!-- Pista Teórica -->
+      <div class="bg-purple-50 p-5 rounded-2xl border-2 border-purple-200 text-sm space-y-3">
+        <h4 class="font-extrabold text-purple-900 text-base flex items-center gap-2">
+          <i class="fa-solid fa-scale-unbalanced text-purple-700"></i> Pista Teórica: Regla de la Tarea Real (OIT)
+        </h4>
+        <p class="text-slate-700 leading-relaxed text-xs">
+          Para clasificar un trabajo internacionalmente, la OIT dicta que <strong>lo que importa es lo que la persona HACE DÍA A DÍA</strong>, no el diploma universitario que tenga colgado en la pared.
+        </p>
+        <div class="bg-white p-3 rounded-xl border border-purple-200 text-xs font-semibold text-purple-950">
+          📌 <strong>Regla Principal:</strong> Si un profesional con título realiza funciones de nivel operativo, el puesto se clasifica según las tareas reales del puesto (Nivel Operativo), evitando sobrepagar o clasificar mal la vacante.
+        </div>
+      </div>
+
+      <!-- Reto Interactivo 2 -->
+      <div class="bg-yellow-50 p-5 rounded-2xl border-2 border-yellow-300 space-y-4">
+        <h4 class="font-extrabold text-purple-900 text-base">
+          🕵️ Caso de Estudio: El Dilema de Mariana
+        </h4>
+        <div class="bg-white p-4 rounded-xl border-2 border-slate-200 text-xs space-y-2 text-slate-700">
+          <p>
+            <strong>Contexto:</strong> Mariana es graduada como <em>Ingeniera Industrial (Nivel 4 OIT)</em>. Sin embargo, fue contratada formalmente como <strong>"Cajera del Punto de Venta"</strong>. Sus tareas diarias son exclusivamente cobrar, registrar productos y hacer arqueo de caja.
+          </p>
+          <p class="font-extrabold text-purple-900">
+            ¿En qué Nivel OIT debe clasificarse la OCUPACIÓN REAL de Mariana?
+          </p>
+        </div>
+
+        <!-- Options via Radio Buttons -->
+        <div class="space-y-2">
+          <label class="flex items-center gap-3 bg-white p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 transition">
+            <input type="radio" name="st2-option" value="4" onchange="calcEstacion2()" class="w-4 h-4 accent-purple-800">
+            <span class="text-xs font-bold text-slate-800">Opción A: Nivel 4 - Porque tiene título universitario de Ingeniería.</span>
+          </label>
+
+          <label class="flex items-center gap-3 bg-white p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 transition">
+            <input type="radio" name="st2-option" value="2" onchange="calcEstacion2()" class="w-4 h-4 accent-purple-800">
+            <span class="text-xs font-bold text-slate-800">Opción B: Nivel 2 - Porque la Regla de Tarea Real manda que Cajera requiere habilidades operativas (Nivel 2).</span>
+          </label>
+
+          <label class="flex items-center gap-3 bg-white p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 transition">
+            <input type="radio" name="st2-option" value="3" onchange="calcEstacion2()" class="w-4 h-4 accent-purple-800">
+            <span class="text-xs font-bold text-slate-800">Opción C: Nivel 3 - Promedio entre su estudio y sus tareas.</span>
+          </label>
+        </div>
+
+        <!-- Resultado Estación 2 -->
+        <div class="bg-purple-900 text-white p-4 rounded-xl flex items-center justify-between flex-wrap gap-2">
+          <div class="text-xs font-bold">
+            Dictamen CIUO-08: <span id="st2-feedback" class="text-yellow-300 font-semibold">Selecciona una respuesta...</span>
+          </div>
+          <div class="bg-yellow-400 text-purple-950 px-4 py-1.5 rounded-lg text-sm font-black">
+            Dígito 2 Obtenido: <span id="digito-2-val" class="text-lg">?</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== ESTACIÓN 3 ==================== -->
+    <section class="bg-white p-6 md:p-8 rounded-3xl border-4 border-purple-900 shadow-xl space-y-6">
+      <div class="flex items-center justify-between flex-wrap gap-2 border-b-4 border-yellow-400 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="bg-purple-800 text-yellow-300 font-black text-2xl w-12 h-12 rounded-2xl flex items-center justify-center shadow">
+            3
+          </div>
+          <div>
+            <span class="text-xs font-bold text-purple-600 uppercase tracking-widest">Estación 3</span>
+            <h3 class="text-2xl font-black text-purple-950">La Balanza Salarial - Valuación de Cargos</h3>
+          </div>
+        </div>
+        <span class="bg-yellow-400 text-purple-950 text-xs font-black px-3 py-1 rounded-full uppercase border-2 border-black/10">
+          Dígito 3 / 4
+        </span>
+      </div>
+
+      <!-- Pista Teórica -->
+      <div class="bg-purple-50 p-5 rounded-2xl border-2 border-purple-200 text-sm space-y-3">
+        <h4 class="font-extrabold text-purple-900 text-base flex items-center gap-2">
+          <i class="fa-solid fa-calculator text-purple-700"></i> Pista Teórica: Método Punto Factor
+        </h4>
+        <p class="text-slate-700 leading-relaxed text-xs">
+          El método de puntos asigna una calificación numérica a cada cargo según su responsabilidad. A mayor puntaje, mayor valor tiene el puesto para la empresa.
+        </p>
+      </div>
+
+      <!-- Reto Interactivo 3 (Luz Amarilla 1 Solucionada) -->
+      <div class="bg-yellow-50 p-5 rounded-2xl border-2 border-yellow-300 space-y-4">
+        <h4 class="font-extrabold text-purple-900 text-base">
+          ⚖️ Reto: Diferencia de Valoración Salarial
+        </h4>
+        <p class="text-xs text-slate-600 font-semibold">
+          Compara la puntuación de dos cargos clave de "Innovación & Retail S.A.":
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white p-4 rounded-xl border-2 border-slate-200 text-center space-y-1">
+            <span class="text-xs font-black text-purple-700 uppercase">Cargo A</span>
+            <h5 class="text-sm font-extrabold text-slate-800">Auxiliar de Bodega</h5>
+            <div class="text-2xl font-black text-purple-900">50 <span class="text-xs text-slate-500 font-bold">Puntos</span></div>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border-2 border-slate-200 text-center space-y-1">
+            <span class="text-xs font-black text-purple-700 uppercase">Cargo B</span>
+            <h5 class="text-sm font-extrabold text-slate-800">Analista de Créditos</h5>
+            <div class="text-2xl font-black text-purple-900">70 <span class="text-xs text-slate-500 font-bold">Puntos</span></div>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border-2 border-purple-200 space-y-3">
+          <div class="text-xs font-bold text-slate-700 space-y-1">
+            <p>1. Resta de puntos: <code>70 - 50 = 20 Puntos de Brecha</code>.</p>
+            <p>2. Aplicar divisor institucional: <code>Diferencia (20) ÷ 10 = Factor Resultado</code>.</p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3 pt-2">
+            <label class="text-xs font-extrabold text-purple-950">
+              Ingresa la resta de puntos (20) o el Factor Resultado directo:
+            </label>
+            <input type="number" id="st3-input-puntos" placeholder="Ej: 20 ó 2" oninput="calcEstacion3()" 
+                   class="bg-slate-100 border-2 border-purple-400 rounded-xl px-4 py-2 text-sm font-black text-purple-950 w-32 focus:outline-none focus:border-yellow-500">
+          </div>
+        </div>
+
+        <!-- Resultado Estación 3 -->
+        <div class="bg-purple-900 text-white p-4 rounded-xl flex items-center justify-between flex-wrap gap-2">
+          <div class="text-xs font-bold">
+            Estatus de Valuación: <span id="st3-feedback" class="text-yellow-300 font-semibold">Ingresa el valor...</span>
+          </div>
+          <div class="bg-yellow-400 text-purple-950 px-4 py-1.5 rounded-lg text-sm font-black">
+            Dígito 3 Obtenido: <span id="digito-3-val" class="text-lg">?</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== ESTACIÓN 4 ==================== -->
+    <section class="bg-white p-6 md:p-8 rounded-3xl border-4 border-purple-900 shadow-xl space-y-6">
+      <div class="flex items-center justify-between flex-wrap gap-2 border-b-4 border-yellow-400 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="bg-purple-800 text-yellow-300 font-black text-2xl w-12 h-12 rounded-2xl flex items-center justify-center shadow">
+            4
+          </div>
+          <div>
+            <span class="text-xs font-bold text-purple-600 uppercase tracking-widest">Estación 4</span>
+            <h3 class="text-2xl font-black text-purple-950">El Rayo X - Intrínseco vs. Extrínseco</h3>
+          </div>
+        </div>
+        <span class="bg-yellow-400 text-purple-950 text-xs font-black px-3 py-1 rounded-full uppercase border-2 border-black/10">
+          Dígito 4 / 4
+        </span>
+      </div>
+
+      <!-- Pista Teórica -->
+      <div class="bg-purple-50 p-5 rounded-2xl border-2 border-purple-200 text-sm space-y-3">
+        <h4 class="font-extrabold text-purple-900 text-base flex items-center gap-2">
+          <i class="fa-solid fa-magnifying-glass text-purple-700"></i> Pista Teórica: Las Dos Caras del Perfil (Chiavenato)
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-semibold">
+          <div class="bg-white p-3 rounded-xl border border-purple-200">
+            <span class="text-purple-800 font-extrabold block mb-1">📄 Análisis Intrínseco (Descripción)</span>
+            ¿QUÉ HACE EL PUESTO? (Tareas y funciones. Inicia siempre con <em>VERBO EN INFINITIVO</em>: Diseñar, Operar, Revisar).
+          </div>
+          <div class="bg-white p-3 rounded-xl border border-purple-200">
+            <span class="text-purple-800 font-extrabold block mb-1">🔍 Análisis Extrínseco (Especificación)</span>
+            ¿QUÉ EXIGE EL PUESTO A LA PERSONA? (Estudios, experiencia, licencias, riesgos de trabajo y responsabilidades).
+          </div>
+        </div>
+      </div>
+
+      <!-- Reto Interactivo 4 -->
+      <div class="bg-yellow-50 p-5 rounded-2xl border-2 border-yellow-300 space-y-4">
+        <h4 class="font-extrabold text-purple-900 text-base">
+          🧪 Clasificador de Elementos del Perfil
+        </h4>
+        <p class="text-xs text-slate-600 font-semibold">
+          Selecciona ÚNICAMENTE los elementos que pertenezcan al <strong>ANÁLISIS EXTRÍNSECO (Requisitos pedidos a la persona)</strong>. El <strong>Dígito 4</strong> será el TOTAL de elementos extrínsecos marcados correctamente.
+        </p>
+
+        <div class="space-y-2">
+          
+          <label class="flex items-center gap-3 bg-white p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 transition">
+            <input type="checkbox" id="st4-check-1" onchange="calcEstacion4()" class="w-4 h-4 rounded accent-purple-800">
+            <span class="text-xs font-bold text-slate-800">Elemento 1: Licencia de Conducir C2 y Educación Técnica Mínima (Requisito exigido)</span>
+          </label>
+
+          <label class="flex items-center gap-3 bg-white p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 transition">
+            <input type="checkbox" id="st4-check-2" onchange="calcEstacion4()" class="w-4 h-4 rounded accent-purple-800">
+            <span class="text-xs font-bold text-slate-800">Elemento 2: "Elaborar mensualmente los estados financieros" (Tarea con Verbo Infinitivo = Intrínseco)</span>
+          </label>
+
+          <label class="flex items-center gap-3 bg-white p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 transition">
+            <input type="checkbox" id="st4-check-3" onchange="calcEstacion4()" class="w-4 h-4 rounded accent-purple-800">
+            <span class="text-xs font-bold text-slate-800">Elemento 3: Responsabilidad por manejo de caja chica de $5.000 USD (Responsabilidad Implícita)</span>
+          </label>
+
+          <label class="flex items-center gap-3 bg-white p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 transition">
+            <input type="checkbox" id="st4-check-4" onchange="calcEstacion4()" class="w-4 h-4 rounded accent-purple-800">
+            <span class="text-xs font-bold text-slate-800">Elemento 4: Disposición a trabajar en ambientes con nivel alto de ruido (Condiciones de Trabajo)</span>
+          </label>
+
+          <label class="flex items-center gap-3 bg-white p-3 rounded-xl border-2 border-slate-200 cursor-pointer hover:border-purple-400 transition">
+            <input type="checkbox" id="st4-check-5" onchange="calcEstacion4()" class="w-4 h-4 rounded accent-purple-800">
+            <span class="text-xs font-bold text-slate-800">Elemento 5: "Supervisar diariamente al personal de la planta" (Atribución = Intrínseco)</span>
+          </label>
+
+        </div>
+
+        <!-- Resultado Estación 4 -->
+        <div class="bg-purple-900 text-white p-4 rounded-xl flex items-center justify-between flex-wrap gap-2">
+          <div class="text-xs font-bold">
+            Conteo de Factores Extrínsecos: <span id="st4-feedback" class="text-yellow-300 font-semibold">Selecciona casillas...</span>
+          </div>
+          <div class="bg-yellow-400 text-purple-950 px-4 py-1.5 rounded-lg text-sm font-black">
+            Dígito 4 Obtenido: <span id="digito-4-val" class="text-lg">?</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== EXIT TICKET & REFLEXIÓN ==================== -->
+    <!-- Optimizado a 3 preguntas principales de síntesis (Luz Amarilla 2 Solucionada) -->
+    <section class="bg-white p-6 md:p-8 rounded-3xl border-4 border-purple-900 shadow-xl space-y-6">
+      <div class="flex items-center gap-3 border-b-4 border-yellow-400 pb-4">
+        <div class="bg-purple-800 text-yellow-300 font-black text-2xl w-12 h-12 rounded-2xl flex items-center justify-center shadow">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-purple-600 uppercase tracking-widest">Cierre Pedagógico</span>
+          <h3 class="text-2xl font-black text-purple-950">Exit Ticket - Síntesis Breve del Equipo</h3>
+        </div>
+      </div>
+
+      <p class="text-xs text-slate-600 font-semibold">
+        Respondan a estas 3 preguntas de síntesis ejecutiva para validar su aprendizaje:
+      </p>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-extrabold text-purple-950 mb-1">
+            1. (item-1) Tarea Real vs Título (Caso Mariana): ¿Por qué es un error pagar o clasificar un cargo según el título universitario del empleado y no por la tarea real desempeñada?
+          </label>
+          <textarea id="item-1" rows="3" placeholder="Redacten su síntesis..." 
+                    class="w-full bg-slate-50 border-2 border-purple-200 rounded-xl p-3 text-xs font-semibold text-slate-800 focus:outline-none focus:border-purple-600 transition break-words-all"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-extrabold text-purple-950 mb-1">
+            2. (item-2) Descripción (Intrínseco) vs Especificación (Extrínseco): ¿Cuál es la diferencia clave entre lo que HACE un puesto y lo que PIDE a la persona?
+          </label>
+          <textarea id="item-2" rows="3" placeholder="Redacten su síntesis..." 
+                    class="w-full bg-slate-50 border-2 border-purple-200 rounded-xl p-3 text-xs font-semibold text-slate-800 focus:outline-none focus:border-purple-600 transition break-words-all"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-extrabold text-purple-950 mb-1">
+            3. (item-3) Equidad Salarial y Recomendación Final: ¿Cómo la valuación por Puntos evita favoritismos y qué consejo le dan a "Innovación & Retail S.A."?
+          </label>
+          <textarea id="item-3" rows="3" placeholder="Redacten sus conclusiones..." 
+                    class="w-full bg-slate-50 border-2 border-purple-200 rounded-xl p-3 text-xs font-semibold text-slate-800 focus:outline-none focus:border-purple-600 transition break-words-all"></textarea>
+        </div>
+
+        <!-- Campos auxiliares opcionales para preservar estructura JSON -->
+        <input type="hidden" id="item-4" value="Sintetizado en Ítem 3">
+        <input type="hidden" id="item-5" value="Sintetizado en Ítem 3">
+      </div>
+    </section>
+
+    <!-- ==================== RÚBRICA PEDAGÓGICA INTEGRAL (5 ÍTEMS) ==================== -->
+    <section class="bg-white p-6 md:p-8 rounded-3xl border-4 border-purple-900 shadow-xl space-y-4">
+      <h3 class="text-xl font-black text-purple-950 flex items-center gap-2">
+        <i class="fa-solid fa-table-list text-purple-700"></i> Rúbrica Pedagógica de Evaluación
+      </h3>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-purple-900 text-white font-black">
+              <th class="p-3 border border-purple-800">Criterio</th>
+              <th class="p-3 border border-purple-800">Excelente (5.0)</th>
+              <th class="p-3 border border-purple-800">Bueno (4.0)</th>
+              <th class="p-3 border border-purple-800">Aceptable (3.0)</th>
+              <th class="p-3 border border-purple-800">Insuficiente (1.0-2.0)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 font-semibold text-slate-700">
+            <tr>
+              <td class="p-3 bg-purple-50 font-extrabold text-purple-950 border border-slate-200">1. Niveles OIT (Estación 1)</td>
+              <td class="p-3 border border-slate-200">Clasifica el 100% de puestos con fundamento riguroso.</td>
+              <td class="p-3 border border-slate-200">Clasifica puestos con errores menores de razonamiento.</td>
+              <td class="p-3 border border-slate-200">Confunde 2 niveles de competencia OIT.</td>
+              <td class="p-3 border border-slate-200">No identifica la jerarquía de la OIT.</td>
+            </tr>
+            <tr>
+              <td class="p-3 bg-purple-50 font-extrabold text-purple-950 border border-slate-200">2. Reglas CIUO-08 (Estación 2)</td>
+              <td class="p-3 border border-slate-200">Aplica con precisión la Regla de Tarea Real frente a titulación.</td>
+              <td class="p-3 border border-slate-200">Comprende la regla pero vacila en el dictamen técnico.</td>
+              <td class="p-3 border border-slate-200">Confunde la titulación formal con la ocupación.</td>
+              <td class="p-3 border border-slate-200">No aplica las reglas directrices del CIUO.</td>
+            </tr>
+            <tr>
+              <td class="p-3 bg-purple-50 font-extrabold text-purple-950 border border-slate-200">3. Valuación Salarial (Estación 3)</td>
+              <td class="p-3 border border-slate-200">Diferencia métodos cuali/cuanti y calcula brechas exactamente.</td>
+              <td class="p-3 border border-slate-200">Calcula la brecha pero confunde los nombres de métodos.</td>
+              <td class="p-3 border border-slate-200">Requiere múltiples intentos para resolver el cálculo.</td>
+              <td class="p-3 border border-slate-200">No interpreta el sistema Punto Factor.</td>
+            </tr>
+            <tr>
+              <td class="p-3 bg-purple-50 font-extrabold text-purple-950 border border-slate-200">4. Perfil Chiavenato (Estación 4)</td>
+              <td class="p-3 border border-slate-200">Distingue el 100% de requisitos extrínsecos vs intrínsecos.</td>
+              <td class="p-3 border border-slate-200">Identifica la mayoría de requisitos con precisión.</td>
+              <td class="p-3 border border-slate-200">Confunde las tareas con especificaciones del cargo.</td>
+              <td class="p-3 border border-slate-200">No diferencia descripción de especificación.</td>
+            </tr>
+            <tr>
+              <td class="p-3 bg-purple-50 font-extrabold text-purple-950 border border-slate-200">5. Exit Ticket / Reflexión</td>
+              <td class="p-3 border border-slate-200">Argumentación crítica, profunda, sin vacíos y aplicable.</td>
+              <td class="p-3 border border-slate-200">Respuestas completas pero de alcance superficial.</td>
+              <td class="p-3 border border-slate-200">Respuestas breves o incompletas en varios campos.</td>
+              <td class="p-3 border border-slate-200">Campos vacíos o respuestas fuera de contexto.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== ACCIONES FINALIZACIÓN ==================== -->
+    <section class="bg-purple-900 text-white p-6 rounded-3xl border-4 border-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 no-print">
+      <div>
+        <h4 class="text-xl font-extrabold text-yellow-300">¿Listos para oficializar la entrega?</h4>
+        <p class="text-xs text-purple-200">Transmitan los datos al sistema docente e impriman su reporte oficial.</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <button onclick="submitToGoogleSheets()" class="bg-lime-400 hover:bg-lime-500 text-purple-950 font-black py-3 px-6 rounded-xl shadow-lg transition-all sticker-btn flex items-center gap-2">
+          <i class="fa-solid fa-paper-plane"></i> Enviar Trabajo al Docente ▶
+        </button>
+
+        <button onclick="openPreview()" class="bg-yellow-400 hover:bg-yellow-500 text-purple-950 font-black py-3 px-6 rounded-xl shadow-lg transition-all sticker-btn flex items-center gap-2">
+          <i class="fa-solid fa-file-pdf"></i> Exportar a PDF / Imprimir ▶
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== WIDGET CANDADO DIGITAL (STICKY FOOTER) ==================== -->
+  <div class="fixed bottom-0 left-0 right-0 z-50 bg-purple-950 text-white border-t-4 border-yellow-400 p-3 shadow-2xl no-print">
+    <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <div class="flex items-center gap-3">
+        <div id="lock-icon-box" class="bg-red-500 text-white p-2.5 rounded-xl text-xl font-black shadow border border-white">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <div>
+          <div class="text-xs font-black text-yellow-300 uppercase tracking-wide">Candado Criptográfico Digital</div>
+          <div id="lock-status-text" class="text-xs text-purple-200 font-semibold">Sistema bloqueado. Resuelvan las estaciones para calcular los 4 dígitos.</div>
+        </div>
+      </div>
+
+      <!-- Keypad Form & Editable Keypad Option -->
+      <div class="flex items-center gap-2">
+        <div class="flex gap-1 font-mono">
+          <input type="text" id="code-digit-1" maxlength="1" class="w-9 h-10 bg-purple-900 border-2 border-yellow-400 rounded-lg text-center font-black text-yellow-300 text-lg focus:outline-none focus:bg-purple-800" placeholder="?">
+          <input type="text" id="code-digit-2" maxlength="1" class="w-9 h-10 bg-purple-900 border-2 border-yellow-400 rounded-lg text-center font-black text-yellow-300 text-lg focus:outline-none focus:bg-purple-800" placeholder="?">
+          <input type="text" id="code-digit-3" maxlength="1" class="w-9 h-10 bg-purple-900 border-2 border-yellow-400 rounded-lg text-center font-black text-yellow-300 text-lg focus:outline-none focus:bg-purple-800" placeholder="?">
+          <input type="text" id="code-digit-4" maxlength="1" class="w-9 h-10 bg-purple-900 border-2 border-yellow-400 rounded-lg text-center font-black text-yellow-300 text-lg focus:outline-none focus:bg-purple-800" placeholder="?">
+        </div>
+
+        <button onclick="unlockVault()" class="bg-yellow-400 hover:bg-yellow-500 text-purple-950 px-4 py-2 rounded-xl text-xs font-black transition-all shadow sticker-btn flex items-center gap-1">
+          DESBLOQUEAR CANDADO ▶
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== LÓGICA JAVASCRIPT ==================== -->
+  <script>
+    // CONSTANTE OFICIAL DEL WEBHOOK GOOGLE APPS SCRIPT
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbykP5mOpfvgjO-R3aMf2t8tzAg-nc5Tc2cpVmtpRh33C-ZwYUW9G9-CWr-bq7zVEv5s/exec";
+
+    // Variables Globales de Estado
+    let d1 = 0, d2 = 0, d3 = 0, d4 = 0;
+    const CLAVE_CORRECTA = "8223";
+    let timerSeconds = 65 * 60;
+    let timerInterval = null;
+
+    // Inicialización al cargar la ventana
+    window.onload = function() {
+      startTimer();
+      setupAutoSave();
+      loadFromLocalStorage();
+    };
+
+    // --- TEMPORIZADOR ---
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (timerSeconds > 0) {
+          timerSeconds--;
+          updateTimerDisplay();
+        } else {
+          clearInterval(timerInterval);
+          alert("⏰ ¡El tiempo de 65:00 minutos ha expirado! Procedan a guardar y enviar su trabajo.");
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      if (confirm("¿Deseas reiniciar el temporizador a 65:00 minutos?")) {
+        timerSeconds = 65 * 60;
+        updateTimerDisplay();
+      }
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(timerSeconds / 60);
+      const secs = timerSeconds % 60;
+      const formatted = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      document.getElementById('timer-display').innerText = formatted;
+    }
+
+    // --- CÁLCULO DE ESTACIONES CON FALLBACK LIMPIO ---
+
+    // Estación 1: Puesto A (1) + Puesto B (3) + Puesto C (4) = 8
+    function calcEstacion1() {
+      const p1 = parseInt(document.getElementById('st1-p1').value) || 0;
+      const p2 = parseInt(document.getElementById('st1-p2').value) || 0;
+      const p3 = parseInt(document.getElementById('st1-p3').value) || 0;
+
+      const suma = p1 + p2 + p3;
+      document.getElementById('st1-formula').innerText = `${p1} + ${p2} + ${p3} = ${suma}`;
+
+      if (p1 === 1 && p2 === 3 && p3 === 4) {
+        d1 = 8;
+        document.getElementById('digito-1-val').innerText = "8 ✅";
+        document.getElementById('code-digit-1').value = "8";
+      } else {
+        d1 = 0;
+        document.getElementById('digito-1-val').innerText = "?";
+        document.getElementById('code-digit-1').value = "";
+      }
+      saveToLocalStorage();
+    }
+
+    // Estación 2: Opción B (2) -> Mariana en Tarea Real
+    function calcEstacion2() {
+      const selected = document.querySelector('input[name="st2-option"]:checked');
+      if (selected) {
+        const val = parseInt(selected.value);
+        if (val === 2) {
+          d2 = 2;
+          document.getElementById('st2-feedback').innerText = "¡Correcto! Se aplica la Regla de Tarea Real (Cajera = Nivel 2).";
+          document.getElementById('digito-2-val').innerText = "2 ✅";
+          document.getElementById('code-digit-2').value = "2";
+        } else {
+          d2 = 0;
+          document.getElementById('st2-feedback').innerText = "Incorrecto. Recuerda que la OIT prioriza la Tarea Real desempeñada.";
+          document.getElementById('digito-2-val').innerText = "❌";
+          document.getElementById('code-digit-2').value = "";
+        }
+      } else {
+        d2 = 0;
+        document.getElementById('code-digit-2').value = "";
+      }
+      saveToLocalStorage();
+    }
+
+    // Estación 3: Puntos Resta (20) O Factor Directo (2) -> Dígito 2
+    function calcEstacion3() {
+      const inputVal = parseInt(document.getElementById('st3-input-puntos').value) || 0;
+      
+      if (inputVal === 20 || inputVal === 2) {
+        d3 = 2;
+        document.getElementById('st3-feedback').innerText = "¡Excelente! Diferencia 20 pts ÷ 10 = Factor Dígito 2.";
+        document.getElementById('digito-3-val').innerText = "2 ✅";
+        document.getElementById('code-digit-3').value = "2";
+      } else {
+        d3 = 0;
+        document.getElementById('st3-feedback').innerText = "Valor incorrecto. Brecha = 70 - 50 = 20 (Factor = 2).";
+        document.getElementById('digito-3-val').innerText = "?";
+        document.getElementById('code-digit-3').value = "";
+      }
+      saveToLocalStorage();
+    }
+
+    // Estación 4: Requisitos Extrínsecos (Checks 1, 3 y 4 marcados, 2 y 5 desmarcados = Total 3)
+    function calcEstacion4() {
+      const c1 = document.getElementById('st4-check-1').checked;
+      const c2 = document.getElementById('st4-check-2').checked;
+      const c3 = document.getElementById('st4-check-3').checked;
+      const c4 = document.getElementById('st4-check-4').checked;
+      const c5 = document.getElementById('st4-check-5').checked;
+
+      if (c1 && !c2 && c3 && c4 && !c5) {
+        d4 = 3;
+        document.getElementById('st4-feedback').innerText = "¡Perfecto! Identificaste los 3 factores extrínsecos.";
+        document.getElementById('digito-4-val').innerText = "3 ✅";
+        document.getElementById('code-digit-4').value = "3";
+      } else {
+        d4 = 0;
+        document.getElementById('st4-feedback').innerText = "Revisa: Los verbos en infinitivo (Elaborar/Supervisar) son Intrínsecos.";
+        document.getElementById('digito-4-val').innerText = "?";
+        document.getElementById('code-digit-4').value = "";
+      }
+      saveToLocalStorage();
+    }
+
+    // --- CANDADO DIGITAL ---
+    function unlockVault() {
+      // Capturar valores ingresados manualmente o autocompletados
+      const i1 = document.getElementById('code-digit-1').value.trim();
+      const i2 = document.getElementById('code-digit-2').value.trim();
+      const i3 = document.getElementById('code-digit-3').value.trim();
+      const i4 = document.getElementById('code-digit-4').value.trim();
+
+      const codeInput = `${i1}${i2}${i3}${i4}`;
+
+      if (codeInput === CLAVE_CORRECTA) {
+        const lockIcon = document.getElementById('lock-icon-box');
+        lockIcon.className = "bg-lime-400 text-purple-950 p-2.5 rounded-xl text-xl font-black shadow border border-white animate-bounce";
+        lockIcon.innerHTML = `<i class="fa-solid fa-lock-open"></i>`;
+        
+        document.getElementById('lock-status-text').innerHTML = `<span class="text-lime-400 font-extrabold">¡SISTEMA DESBLOQUEADO CON ÉXITO! Clave 8223 Aceptada.</span>`;
+        alert("🎉 ¡FELICITACIONES CONSULTORES! Han ingresado la clave correcta (8223). El sistema de nómina y selección de 'Innovación & Retail S.A.' ha sido restaurado.");
+      } else {
+        alert(`❌ Clave Incorrecta (${codeInput || 'Incompleta'}). Verifiquen los cálculos de las 4 estaciones.`);
+      }
+    }
+
+    // --- AUTOGUARDADO LOCALSTORAGE ---
+    function setupAutoSave() {
+      const inputs = document.querySelectorAll('input, textarea, select');
+      inputs.forEach(input => {
+        input.addEventListener('input', saveToLocalStorage);
+        input.addEventListener('change', saveToLocalStorage);
+      });
+    }
+
+    function saveToLocalStorage() {
+      // FIX 6: protección try/catch (Safari privado / iframes pueden bloquear localStorage)
+      try {
+        const data = getFormData();
+        data['st1-p1'] = document.getElementById('st1-p1')?.value;
+        data['st1-p2'] = document.getElementById('st1-p2')?.value;
+        data['st1-p3'] = document.getElementById('st1-p3')?.value;
+        data['st2-option'] = document.querySelector('input[name="st2-option"]:checked')?.value || "";
+        data['st3-input-puntos'] = document.getElementById('st3-input-puntos')?.value;
+        data['st4-check-1'] = document.getElementById('st4-check-1')?.checked;
+        data['st4-check-2'] = document.getElementById('st4-check-2')?.checked;
+        data['st4-check-3'] = document.getElementById('st4-check-3')?.checked;
+        data['st4-check-4'] = document.getElementById('st4-check-4')?.checked;
+        data['st4-check-5'] = document.getElementById('st4-check-5')?.checked;
+
+        localStorage.setItem('i3_escape_perfiles_data_v2', JSON.stringify(data));
+      } catch (e) {
+        console.warn("LocalStorage no disponible:", e);
+      }
+    }
+
+    function loadFromLocalStorage() {
+      let raw = null;
+      try {
+        raw = localStorage.getItem('i3_escape_perfiles_data_v2');
+      } catch (e) {
+        console.warn("LocalStorage no disponible:", e);
+        return;
+      }
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        if (data.materia) document.getElementById('input-materia').value = data.materia;
+        if (data.grupo) document.getElementById('input-grupo').value = data.grupo;
+        if (data.participantes) document.getElementById('input-participantes').value = data.participantes;
+
+        if (data.item1) document.getElementById('item-1').value = data.item1;
+        if (data.item2) document.getElementById('item-2').value = data.item2;
+        if (data.item3) document.getElementById('item-3').value = data.item3;
+
+        if (data['st1-p1']) document.getElementById('st1-p1').value = data['st1-p1'];
+        if (data['st1-p2']) document.getElementById('st1-p2').value = data['st1-p2'];
+        if (data['st1-p3']) document.getElementById('st1-p3').value = data['st1-p3'];
+        calcEstacion1();
+
+        if (data['st2-option']) {
+          const radio = document.querySelector(`input[name="st2-option"][value="${data['st2-option']}"]`);
+          if (radio) radio.checked = true;
+          calcEstacion2();
+        }
+
+        if (data['st3-input-puntos']) {
+          document.getElementById('st3-input-puntos').value = data['st3-input-puntos'];
+          calcEstacion3();
+        }
+
+        if (data['st4-check-1'] !== undefined) document.getElementById('st4-check-1').checked = data['st4-check-1'];
+        if (data['st4-check-2'] !== undefined) document.getElementById('st4-check-2').checked = data['st4-check-2'];
+        if (data['st4-check-3'] !== undefined) document.getElementById('st4-check-3').checked = data['st4-check-3'];
+        if (data['st4-check-4'] !== undefined) document.getElementById('st4-check-4').checked = data['st4-check-4'];
+        if (data['st4-check-5'] !== undefined) document.getElementById('st4-check-5').checked = data['st4-check-5'];
+        calcEstacion4();
+
+      } catch (e) {
+        console.error("Error al cargar autoguardado LocalStorage:", e);
+      }
+    }
+
+    // --- RECOLECCIÓN Y RESPALDO JSON ---
+    function getFormData() {
+      const i1 = document.getElementById('code-digit-1')?.value || "";
+      const i2 = document.getElementById('code-digit-2')?.value || "";
+      const i3 = document.getElementById('code-digit-3')?.value || "";
+      const i4 = document.getElementById('code-digit-4')?.value || "";
+      const keyEntered = `${i1}${i2}${i3}${i4}`;
+
+      return {
+        materia: document.getElementById('input-materia')?.value || "Diseño y Análisis de Perfiles",
+        actividad_id: document.getElementById('input-actividad-id')?.value || "Perfiles1_ACT02",
+        grupo: document.getElementById('input-grupo')?.value || "",
+        participantes: document.getElementById('input-participantes')?.value || "",
+        item1: document.getElementById('item-1')?.value || "",
+        item2: document.getElementById('item-2')?.value || "",
+        item3: document.getElementById('item-3')?.value || "",
+        item4: document.getElementById('item-4')?.value || "Sintetizado",
+        item5: document.getElementById('item-5')?.value || "Sintetizado",
+        clave_descifrada: keyEntered,
+        estado: keyEntered === CLAVE_CORRECTA ? "Desbloqueado" : "En Progreso"
+      };
+    }
+
+    function downloadBackup() {
+      const data = getFormData();
+      const jsonStr = JSON.stringify(data, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Respaldo_${data.actividad_id}_${data.grupo || 'i3'}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.materia) document.getElementById('input-materia').value = data.materia;
+          if (data.grupo) document.getElementById('input-grupo').value = data.grupo;
+          if (data.participantes) document.getElementById('input-participantes').value = data.participantes;
+
+          if (data.item1) document.getElementById('item-1').value = data.item1;
+          if (data.item2) document.getElementById('item-2').value = data.item2;
+          if (data.item3) document.getElementById('item-3').value = data.item3;
+
+          // FIX 7: restaurar también las estaciones (no solo los textos)
+          if (data['st1-p1']) document.getElementById('st1-p1').value = data['st1-p1'];
+          if (data['st1-p2']) document.getElementById('st1-p2').value = data['st1-p2'];
+          if (data['st1-p3']) document.getElementById('st1-p3').value = data['st1-p3'];
+          calcEstacion1();
+
+          if (data['st2-option']) {
+            const radio = document.querySelector(`input[name="st2-option"][value="${data['st2-option']}"]`);
+            if (radio) radio.checked = true;
+            calcEstacion2();
+          }
+
+          if (data['st3-input-puntos']) {
+            document.getElementById('st3-input-puntos').value = data['st3-input-puntos'];
+            calcEstacion3();
+          }
+
+          if (data['st4-check-1'] !== undefined) document.getElementById('st4-check-1').checked = data['st4-check-1'];
+          if (data['st4-check-2'] !== undefined) document.getElementById('st4-check-2').checked = data['st4-check-2'];
+          if (data['st4-check-3'] !== undefined) document.getElementById('st4-check-3').checked = data['st4-check-3'];
+          if (data['st4-check-4'] !== undefined) document.getElementById('st4-check-4').checked = data['st4-check-4'];
+          if (data['st4-check-5'] !== undefined) document.getElementById('st4-check-5').checked = data['st4-check-5'];
+          calcEstacion4();
+
+          saveToLocalStorage();
+          alert("✅ Copia de respaldo JSON cargada exitosamente.");
+        } catch (err) {
+          alert("❌ El archivo subido no es un JSON válido.");
+        } finally {
+          // FIX 7: permitir cargar el mismo archivo de nuevo
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // --- ENVÍO A GOOGLE SHEETS (WEBHOOK APPS SCRIPT) ---
+    function submitToGoogleSheets() {
+      const payload = getFormData();
+
+      if (!payload.participantes || !payload.grupo) {
+        alert("⚠️ Por favor completa los campos de Grupo e Integrantes antes de enviar.");
+        return;
+      }
+
+      alert("⏳ Transmitiendo respuestas al libro del docente en Google Sheets...");
+
+      fetch(WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        // FIX 1: en modo no-cors solo se permiten simple headers;
+        // application/json es rechazado por el navegador y rompe el envío.
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(() => {
+        alert("🚀 ¡Trabajo enviado con éxito al sistema del docente!\n\nNota: Procede a generar y guardar tu copia en PDF como soporte físico o digital.");
+      })
+      .catch(err => {
+        console.error("Error al enviar Webhook:", err);
+        alert("⚠️ Ocurrió una novedad de conexión. Tus respuestas están guardadas en LocalStorage y puedes exportarlas a PDF.");
+      });
+    }
+
+    // FIX 4: escape de HTML para todo campo de usuario interpolado en el PDF
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // --- VISTA PREVIA E IMPRESIÓN PDF CON ICONOS CORREGIDOS (Luz Roja 2 Solucionada) ---
+    function openPreview() {
+      const data = getFormData();
+
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        alert("⚠️ Permite las ventanas emergentes en tu navegador para ver el reporte PDF.");
+        return;
+      }
+
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <!-- FIX 3: la ventana generada no hereda nada de la página padre -->
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Reporte de Evidencia - Instituto i3</title>
+          <!-- FontAwesome Incluido en PDF para evitar iconos rotos -->
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+          <style>
+            @page { size: A4; margin: 15mm; }
+            body {
+              font-family: Arial, Helvetica, sans-serif;
+              color: #0f172a;
+              margin: 30px;
+              line-height: 1.5;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            .header {
+              border-bottom: 3px solid #1e40af;
+              padding-bottom: 15px;
+              margin-bottom: 20px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              flex-wrap: wrap;
+              gap: 8px;
+            }
+            .title {
+              color: #1e40af;
+              font-size: 20px;
+              font-weight: bold;
+              margin: 0;
+            }
+            .subtitle {
+              color: #64748b;
+              font-size: 12px;
+              text-transform: uppercase;
+              font-weight: bold;
+            }
+            .badge {
+              background-color: #dbeafe;
+              color: #1e40af;
+              padding: 6px 12px;
+              border-radius: 8px;
+              font-size: 12px;
+              font-weight: bold;
+            }
+            .section {
+              margin-bottom: 20px;
+              background: #f8fafc;
+              border: 1px solid #e2e8f0;
+              border-radius: 8px;
+              padding: 15px;
+              break-inside: auto;
+            }
+            .section-title {
+              font-size: 13px;
+              font-weight: bold;
+              color: #1e40af;
+              margin-bottom: 8px;
+              text-transform: uppercase;
+              border-bottom: 1px solid #cbd5e1;
+              padding-bottom: 4px;
+              break-after: avoid;
+            }
+            .grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 10px;
+              font-size: 12px;
+            }
+            .field-label {
+              font-weight: bold;
+              color: #475569;
+            }
+            .field-value {
+              font-weight: normal;
+              color: #0f172a;
+              overflow-wrap: anywhere;
+              word-break: break-word;
+            }
+            .question-box {
+              margin-bottom: 12px;
+            }
+            .q-title {
+              font-size: 11px;
+              font-weight: bold;
+              color: #334155;
+            }
+            .q-ans {
+              font-size: 11px;
+              background: #ffffff;
+              border: 1px solid #cbd5e1;
+              padding: 8px;
+              border-radius: 6px;
+              margin-top: 4px;
+              white-space: pre-wrap;
+              overflow-wrap: anywhere;
+              word-break: break-word;
+            }
+            .no-print-btn {
+              background-color: #1e40af;
+              color: white;
+              padding: 10px 20px;
+              border: none;
+              border-radius: 8px;
+              font-weight: bold;
+              cursor: pointer;
+              margin-bottom: 20px;
+            }
+            @media print {
+              .no-print { display: none !important; }
+              body { margin: 0; }
+            }
+            /* FIX 3: media query móvil para el documento generado */
+            @media (max-width: 600px) {
+              body { margin: 14px; }
+              .grid { grid-template-columns: 1fr; }
+              .header { flex-direction: column; align-items: flex-start; }
+            }
+          </style>
+        </head>
+        <body>
+
+          <button onclick="window.print()" class="no-print-btn no-print">🖨️ Imprimir o Guardar como PDF ▶</button>
+
+          <div class="header">
+            <div>
+              <h1 class="title">INSTITUTO i3 — REPORTE DE EVIDENCIA</h1>
+              <div class="subtitle">Escape Room: El Enigma del Perfil Perdido</div>
+            </div>
+            <div class="badge">
+              <i class="fa-solid fa-shield-halved"></i> Estado: ${escapeHTML(data.estado)} (${escapeHTML(data.clave_descifrada) || '----'})
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">DATOS DE REGISTRO E IDENTIFICACIÓN</div>
+            <div class="grid">
+              <div><span class="field-label">Materia:</span> <span class="field-value">${escapeHTML(data.materia)}</span></div>
+              <div><span class="field-label">ID Actividad:</span> <span class="field-value">${escapeHTML(data.actividad_id)}</span></div>
+              <div><span class="field-label">Grupo / Ficha:</span> <span class="field-value">${escapeHTML(data.grupo)}</span></div>
+              <div><span class="field-label">Integrantes:</span> <span class="field-value">${escapeHTML(data.participantes)}</span></div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">EXIT TICKET Y RESPUESTAS DEL EQUIPO</div>
+            
+            <div class="question-box">
+              <div class="q-title">1. Tarea Real vs Título (Caso Mariana):</div>
+              <div class="q-ans">${escapeHTML(data.item1) || 'Sin respuesta.'}</div>
+            </div>
+
+            <div class="question-box">
+              <div class="q-title">2. Descripción (Intrínseco) vs Especificación (Extrínseco):</div>
+              <div class="q-ans">${escapeHTML(data.item2) || 'Sin respuesta.'}</div>
+            </div>
+
+            <div class="question-box">
+              <div class="q-title">3. Equidad Salarial y Recomendación Final:</div>
+              <div class="q-ans">${escapeHTML(data.item3) || 'Sin respuesta.'}</div>
+            </div>
+          </div>
+
+          <!-- FIX 3: border-t no existe en CSS plano; se usa border-top -->
+          <div style="font-size: 10px; color: #94a3b8; text-align: center; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+            Documento firmado digitalmente por el Entorno Virtual del Instituto i3 | Código Validador: ${escapeHTML(data.actividad_id)}-8223
+          </div>
+
+        </body>
+        </html>
+      `;
+
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+    }
+  </script>
+</body>
+</html>
